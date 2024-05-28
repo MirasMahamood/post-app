@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,24 +39,22 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post createPost(Post post) {
-         return postRepository.save(post);
+        post.setUser(getLoggedInUser());
+        return postRepository.save(post);
     }
 
     @Override
     public Post editPost(UUID id, Post post) {
-        Optional<Post> existingPost = postRepository.findById(id);
-        if (existingPost.isPresent()) {
-            Post _post = existingPost.get();
-            _post.setContent(post.getContent());
-            return postRepository.save(_post);
-        } else {
-            logger.error("{}, Post ID: {}", ErrorMessages.ERROR_POST_NOT_FOUND, id);
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_POST_NOT_FOUND);
-        }
+        Post _post = getPost(id);
+        validatePostUserWithLoggedInUser(_post.getUser().getEmail());
+        _post.setContent(post.getContent());
+        return postRepository.save(_post);
     }
 
     @Override
     public void deletePost(UUID id) {
+        Post post = getPost(id);
+        validatePostUserWithLoggedInUser(post.getUser().getEmail());
         postRepository.deleteById(id);
     }
 
@@ -117,5 +117,22 @@ public class PostServiceImpl implements PostService {
             postRepository.saveAll(postList);
         }
 
+    }
+
+    private String getLoggedInUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
+    private User getLoggedInUser() {
+        return userRepository.findByEmail(getLoggedInUserEmail()).
+                orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ERROR_USER_NOT_FOUND));
+    }
+
+    private void validatePostUserWithLoggedInUser(String postUserEmail) {
+        if (!postUserEmail.equals(getLoggedInUserEmail())) {
+            logger.error("Logged in user is {}, and post user is {}", getLoggedInUserEmail(), postUserEmail);
+            throw new SecurityException(ErrorMessages.ERROR_POST_MODIFY_NOT_ALLOWED);
+        }
     }
 }

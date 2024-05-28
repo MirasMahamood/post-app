@@ -13,6 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -34,12 +37,15 @@ public class PostServiceUnitTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        Authentication auth = new UsernamePasswordAuthenticationToken(TestData.getTestUser().getEmail(),null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @Test
     public void createPostSuccessfully() {
         Post post = TestData.getTestPost();
         when(postRepository.save(any(Post.class))).thenReturn(post);
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(post.getUser()));
 
         Post result = postService.createPost(post);
 
@@ -76,6 +82,7 @@ public class PostServiceUnitTest {
     public void deletePostSuccessfully() {
         UUID id = UUID.randomUUID();
         doNothing().when(postRepository).deleteById(id);
+        when(postRepository.findById(id)).thenReturn(Optional.of(TestData.getTestPost()));
 
         postService.deletePost(id);
 

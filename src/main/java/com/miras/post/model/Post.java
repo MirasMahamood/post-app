@@ -19,7 +19,6 @@ public class Post extends AuditModel {
     @Column(length = 1000, nullable = false)
     private String content;
 
-    @NotNull(message = "User is required")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id",referencedColumnName = "id", nullable = false)
     private User user;
