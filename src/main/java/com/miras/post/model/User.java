@@ -1,5 +1,7 @@
 package com.miras.post.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,6 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"createdDate", "modifiedDate", "password"})
 public class User extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,6 +31,7 @@ public class User extends AuditModel {
     @Column(unique=true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @NotNull(message = "Password is required")
     @Size(max = 255)
     @Column(nullable = false)

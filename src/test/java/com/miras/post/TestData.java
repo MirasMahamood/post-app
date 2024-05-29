@@ -26,13 +26,10 @@ public class TestData {
                         "id":"10f72209-3d69-4e2a-809a-3f53909642d6",
                         "content":"Test Content",
                         "user":{
-                            "createdDate":"2024-05-24T08:07:37.511623Z",
-                            "modifiedDate":"2024-05-24T08:07:37.511623Z",
                             "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0",
                             "firstName":"Miras",
                             "lastName":"Mahamood",
-                            "email":"test@gmail.com",
-                            "password":"testpassword"
+                            "email":"test@gmail.com"
                         }
                     }
                 ]
@@ -51,13 +48,10 @@ public class TestData {
                         "id":"10f72209-3d69-4e2a-809a-3f53909642d6",
                         "content":"Test Content",
                         "user":{
-                            "createdDate":"2024-05-24T08:07:37.511623Z",
-                            "modifiedDate":"2024-05-24T08:07:37.511623Z",
                             "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0",
                             "firstName":"Miras",
                             "lastName":"Mahamood",
-                            "email":"test@gmail.com",
-                            "password":"testpassword"
+                            "email":"test@gmail.com"
                         }
                     }
                 ]

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-app
+spec:
+  selector:
+    matchLabels:
+      app: post-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: post-app
+    spec:
+      containers:
+        - name: post-app
+          image: mirasap/post-app:0.0.1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-config
+                  key: host
+
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-config
+                  key: dbName
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secrets
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secrets
+                  key: password
+            - name: JAVA_OPTS
+              value: "-Xmx128m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-app
+spec:
+  selector:
+    app: post-app
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  type: NodePort
