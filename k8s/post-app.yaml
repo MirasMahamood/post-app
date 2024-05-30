@@ -1,35 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: post-app
   name: post-app
+  namespace: default
+  resourceVersion: "65165"
+  uid: 507c7ac4-35f0-42db-bc76-2b26096b07ab
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: post-app
-  replicas: 1
   template:
     metadata:
       labels:
         app: post-app
     spec:
       containers:
-        - name: post-app
-          image: mirasap/post-app:0.0.1
+        - image: mirasap/post-app:0.0.1
+          imagePullPolicy: Always
+          name: post-app
           ports:
             - containerPort: 8080
+              protocol: TCP
           env:
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: postgresql-config
-                  key: host
-
+                  name: post-config
+                  key: dbHost
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: postgresql-config
+                  name: post-config
                   key: dbName
-
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -42,6 +47,16 @@ spec:
                   key: password
             - name: JAVA_OPTS
               value: "-Xmx128m"
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: post-config
+                  key: redisHost
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: post-config
+                  key: redisPort
 ---
 apiVersion: v1
 kind: Service

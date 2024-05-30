@@ -3,6 +3,7 @@ actor User
 participant "PostController" as PC
 participant "PostService" as PS
 participant "PostRepository" as PR
+participant "GlobalExceptionHandler" as GE
 database DB
 
 User -> PC : POST /post

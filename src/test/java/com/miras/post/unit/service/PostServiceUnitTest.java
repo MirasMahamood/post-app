@@ -1,19 +1,21 @@
 package com.miras.post.unit.service;
 
-import com.miras.post.unit.TestData;
 import com.miras.post.exception.ResourceNotFoundException;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.PostRepository;
 import com.miras.post.repository.UserRepository;
 import com.miras.post.service.impl.PostServiceImpl;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.cache.Cache;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +33,12 @@ public class PostServiceUnitTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private RedisCacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -55,7 +63,7 @@ public class PostServiceUnitTest {
         Post post = TestData.getTestPost();
         when(postRepository.save(any(Post.class))).thenReturn(post);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(post.getUser()));
-
+        when(cacheManager.getCache(anyString())).thenReturn(cache);
         Post result = postService.createPost(post);
 
         assertNotNull(result);
@@ -68,9 +76,7 @@ public class PostServiceUnitTest {
         UUID id = post.getId();
         when(postRepository.findById(id)).thenReturn(Optional.of(post));
         when(postRepository.save(any(Post.class))).thenReturn(post);
-
         Post result = postService.editPost(id, post);
-
         assertNotNull(result);
         verify(postRepository, times(1)).findById(id);
         verify(postRepository, times(1)).save(post);

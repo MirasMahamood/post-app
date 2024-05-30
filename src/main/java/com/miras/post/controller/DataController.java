@@ -1,24 +1,24 @@
 package com.miras.post.controller;
 
-import com.miras.post.service.PostService;
+import com.miras.post.service.DataService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO: This is added only to generate test data in db. Needs to be removed.
+// TODO: This is added only to generate test data in db for testing.
 @RestController
 public class DataController {
 
-    private final PostService postService;
+    private final DataService dataService;
 
-    public DataController(PostService postService) {
-        this.postService = postService;
+    public DataController(DataService dataService) {
+        this.dataService = dataService;
     }
 
-    @PostMapping("/createData/{userCount}/{perUserPostCount}")
-    public ResponseEntity<?> generateData(@PathVariable int userCount, int perUserPostCount, int startIndex) {
-        postService.generateData(userCount, perUserPostCount, startIndex);
+    @PostMapping("/createData")
+    public ResponseEntity<?> generateData(@RequestParam int userCount, @RequestParam int perUserPostCount, @RequestParam int startIndex) {
+        dataService.generateData(userCount, perUserPostCount, startIndex);
         return ResponseEntity.ok(null);
     }
 }

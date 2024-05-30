@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: post-config
+data:
+  dbHost: postgresql
+  dbName: postgres
+  redisHost: redis-cache
+  redisPort: "6379"

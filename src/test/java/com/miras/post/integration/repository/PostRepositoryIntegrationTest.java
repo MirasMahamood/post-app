@@ -1,6 +1,5 @@
 package com.miras.post.integration.repository;
 
-import com.miras.post.exception.ResourceNotFoundException;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.PostRepository;
@@ -8,14 +7,11 @@ import com.miras.post.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Optional;
 import java.util.UUID;

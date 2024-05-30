@@ -19,5 +19,4 @@ public interface PostService {
 
     Page<Post> getAllUserPosts(UUID userId, int page, int size);
 
-    void generateData(int count, int perUserPostCount, int startIndex);
 }

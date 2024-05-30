@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: postgresql
   labels:
-    app: postgresql
     tier: database
 spec:
   selector:
@@ -28,7 +27,7 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: postgresql-config
+                  name: post-config
                   key: dbName
           ports:
             - containerPort: 5432

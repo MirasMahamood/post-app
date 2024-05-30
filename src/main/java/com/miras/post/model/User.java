@@ -6,12 +6,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties({"createdDate", "modifiedDate", "password"})
-public class User extends AuditModel {
+public class User extends AuditModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

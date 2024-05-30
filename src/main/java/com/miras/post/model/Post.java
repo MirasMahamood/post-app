@@ -5,11 +5,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "posts")
-public class Post extends AuditModel {
+@Table(name = "posts", indexes = @Index(columnList = "modifiedDate", name = "idx_modified_date"))
+public class Post extends AuditModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
