@@ -1,3 +1,1 @@
 INSERT INTO users(id, email, first_name, last_name, password, created_date, modified_date) VALUES('a1b2c3d4-e5f6-7a8b-9c0d-7890fedcba44', 'admin@gmail.com', 'Admin', 'Admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO posts(id, content, created_date, modified_date, user_id) VALUES(random_uuid(), 'Hello World!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'a1b2c3d4-e5f6-7a8b-9c0d-7890fedcba44');

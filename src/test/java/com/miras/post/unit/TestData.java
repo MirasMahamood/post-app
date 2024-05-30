@@ -1,4 +1,4 @@
-package com.miras.post;
+package com.miras.post.unit;
 
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
@@ -14,58 +14,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 public class TestData {
-    public static final String EXPECTED_ALL_POST_JSON = """
-            {
-                "totalItems":1,
-                "hasNext":false,
-                "currentPage":0,
-                "posts":[
-                    {
-                        "createdDate":"2024-05-24T08:07:37.511475Z",
-                        "modifiedDate":"2024-05-24T08:07:37.511475Z",
-                        "id":"10f72209-3d69-4e2a-809a-3f53909642d6",
-                        "content":"Test Content",
-                        "user":{
-                            "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0",
-                            "firstName":"Miras",
-                            "lastName":"Mahamood",
-                            "email":"test@gmail.com"
-                        }
-                    }
-                ]
-            }
-            """;
-
-    public static final String EXPECTED_ALL_USER_POST_JSON = """
-            {
-                "totalItems":1,
-                "totalPages":1,
-                "currentPage":0,
-                "posts":[
-                    {
-                        "createdDate":"2024-05-24T08:07:37.511475Z",
-                        "modifiedDate":"2024-05-24T08:07:37.511475Z",
-                        "id":"10f72209-3d69-4e2a-809a-3f53909642d6",
-                        "content":"Test Content",
-                        "user":{
-                            "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0",
-                            "firstName":"Miras",
-                            "lastName":"Mahamood",
-                            "email":"test@gmail.com"
-                        }
-                    }
-                ]
-            }
-            """;
-
-    public static final String POST_JSON = """
-            {
-                "content":"Test Content",
-                "user":{
-                    "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0"
-                }
-            }
-            """;
 
     public static Post getTestPost() {
         Post post = new Post();
@@ -247,18 +195,5 @@ public class TestData {
                 return null;
             }
         };
-    }
-
-    public static String generatePostJsonWithContentSize(int size) {
-        StringBuilder content = new StringBuilder();
-        content.append("Repeated Content ".repeat(size));
-        return """
-                {
-                    "content":"%s",
-                    "user":{
-                        "id":"e9017c8f-0ee3-4c9f-ac5c-f53f05e152b0"
-                    }
-                }
-                """.formatted(content.toString());
     }
 }

@@ -1,10 +1,11 @@
 package com.miras.post.unit.controller;
 
-import com.miras.post.TestData;
+import com.miras.post.unit.TestData;
 import com.miras.post.controller.PostController;
 import com.miras.post.exception.ResourceAlreadyExistsException;
 import com.miras.post.model.Post;
 import com.miras.post.service.PostService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,9 +28,16 @@ public class PostControllerUnitTest {
      @InjectMocks
      private PostController postController;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void closeService() throws Exception {
+        closeable.close();
     }
 
      @Test

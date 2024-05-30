@@ -1,12 +1,13 @@
 package com.miras.post.unit.service;
 
-import com.miras.post.TestData;
+import com.miras.post.unit.TestData;
 import com.miras.post.exception.ResourceNotFoundException;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.PostRepository;
 import com.miras.post.repository.UserRepository;
 import com.miras.post.service.impl.PostServiceImpl;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,11 +35,19 @@ public class PostServiceUnitTest {
     @InjectMocks
     private PostServiceImpl postService;
 
+    private AutoCloseable closeable;
+
+
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         Authentication auth = new UsernamePasswordAuthenticationToken(TestData.getTestUser().getEmail(),null);
         SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    @AfterEach
+    void closeService() throws Exception {
+        closeable.close();
     }
 
     @Test
