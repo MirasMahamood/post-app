@@ -3,6 +3,7 @@ package com.miras.post.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.miras.post.integration.config.TestRedisConfiguration;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.UserRepository;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = TestRedisConfiguration.class)
 @AutoConfigureMockMvc
 class PostControllerIntegrationTest {
 

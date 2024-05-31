@@ -1,0 +1,165 @@
+@startuml
+
+package "Configurations" {
+    class AuditConfig {
+    }
+
+    class RedisConfig {
+      String redisHost
+      int redisPort
+      --
+      +redisConnectionFactory(): RedisConnectionFactory
+      +cacheManager(RedisConnectionFactory): RedisCacheManager
+    }
+
+    class SecurityConfig {
+      --
+      +passwordEncoder(): PasswordEncoder
+      +securityFilterChain(HttpSecurity): SecurityFilterChain
+      +userDetailsService(): UserDetailsService
+      +authenticationProvider(): AuthenticationProvider
+    }
+}
+
+package "Controllers" {
+    class PostController {
+      --
+      +createPost(Post): ResponseEntity<Post>
+      +editPost(UUID, Post): ResponseEntity<Post>
+      +deletePost(UUID): ResponseEntity<Void>
+      +getPost(UUID): ResponseEntity<Post>
+      +getAllPosts(int, int): ResponseEntity<?>
+      +getAllUserPosts(UUID, int, int): ResponseEntity<?>
+    }
+
+    class UserController {
+      --
+      +getAllUsers(Pageable): ResponseEntity<?>
+      +saveUser(User): ResponseEntity<?>
+    }
+}
+
+package "Services" {
+    class PostService {
+      --
+      +createPost(Post): Post
+      +editPost(UUID, Post): Post
+      +deletePost(UUID): void
+      +getPost(UUID): Post
+      +getAllPosts(int, int): Slice<Post>
+      +getAllUserPosts(UUID, int, int): Page<Post>
+    }
+
+    class UserService {
+      --
+      +saveUser(User): void
+      +getAllUsers(Pageable): Page<User>
+    }
+
+    class PostServiceImpl {
+      --
+      +createPost(Post): Post
+      +editPost(UUID, Post): Post
+      +deletePost(UUID): void
+      +getPost(UUID): Post
+      +getAllPosts(int, int): Slice<Post>
+      +getAllUserPosts(UUID, int, int): Page<Post>
+    }
+
+    class UserServiceImpl {
+      --
+      +saveUser(User): void
+      +getAllUsers(Pageable): Page<User>
+    }
+    class CustomUserDetailsService {
+      --
+      +loadUserByUsername(String): UserDetails
+    }
+    class PostServiceImpl implements PostService
+    class UserServiceImpl implements UserService
+    class CustomUserDetailsService implements springsecurity.UserDetailsService
+}
+
+package "Repositories" {
+    class PostRepository {
+      --
+      +findAllBy(Pageable): Slice<Post>
+      +findByUser(User, Pageable): Page<Post>
+    }
+
+    class UserRepository {
+      --
+      +findByEmail(String): Optional<User>
+    }
+}
+
+package "Models" {
+    class Post {
+      UUID id
+      String content
+      User
+    }
+
+    class User {
+      UUID id
+      String firstName
+      String lastName
+      String email
+      String password
+    }
+
+    abstract class AuditModel {
+      Instant createdDate
+      Instant modifiedDate
+    }
+
+    AuditModel <|-- Post
+    AuditModel <|-- User
+}
+
+class PostApplication {
+}
+"Configurations" -[hidden]] "Controllers"
+"RedisConfig" -[hidden]down- "PostService"
+"PostController" -[hidden]down- "PostRepository"
+"PostRepository" -[hidden]down- "CustomUserDetailsService"
+"UserRepository" -[hidden]down- "PostApplication"
+
+
+
+newpage
+package "Exceptions" {
+    class ErrorMessages {
+      {static} String ERROR_POST_NOT_FOUND
+      {static} String ERROR_USER_NOT_FOUND
+      {static} String ERROR_USER_EXISTS
+      {static} String ERROR_POST_MODIFY_NOT_ALLOWED
+    }
+
+    class ErrorResponse {
+      int statusCode
+      String message
+      --
+      +getStatusCode(): int
+      +getMessage(): String
+    }
+
+    class GlobalExceptionHandler {
+      --
+      +handleResourceNotFoundException(ResourceNotFoundException)
+      +handleResourceAlreadyExistsException(ResourceAlreadyExistsException)
+      +handleMethodArgumentNotValidException(MethodArgumentNotValidException)
+      +handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException)
+      +handleRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException)
+      +handleHttpMessageNotReadableException(HttpMessageNotReadableException)
+      +handleCommonException(Exception): ResponseEntity<ErrorResponse>
+    }
+
+    class ResourceAlreadyExistsException {
+    }
+
+    class ResourceNotFoundException {
+    }
+}
+
+@enduml

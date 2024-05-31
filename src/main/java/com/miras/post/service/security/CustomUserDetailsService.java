@@ -1,4 +1,4 @@
-package com.miras.post.security;
+package com.miras.post.service.security;
 
 import com.miras.post.model.User;
 import com.miras.post.repository.UserRepository;

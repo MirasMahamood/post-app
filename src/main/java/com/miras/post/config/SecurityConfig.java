@@ -1,6 +1,6 @@
 package com.miras.post.config;
 
-import com.miras.post.security.CustomUserDetailsService;
+import com.miras.post.service.security.CustomUserDetailsService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

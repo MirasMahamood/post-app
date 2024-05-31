@@ -67,5 +67,4 @@ public class PostController {
         response.put("totalPages", pagePosts.getTotalPages());
         return ResponseEntity.ok(response);
     }
-
 }
