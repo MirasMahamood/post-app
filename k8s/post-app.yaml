@@ -4,9 +4,6 @@ metadata:
   labels:
     app: post-app
   name: post-app
-  namespace: default
-  resourceVersion: "65165"
-  uid: 507c7ac4-35f0-42db-bc76-2b26096b07ab
 spec:
   replicas: 1
   selector:
