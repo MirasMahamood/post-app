@@ -35,7 +35,7 @@ public class PostRepositoryIntegrationTest {
     void setUp() {
         User user = userRepository.findByEmail("miras@gmail.com").orElseThrow();
         post = new Post();
-        post.setContent("Hello, Miras!");
+        post.setDescription("Hello, Miras!");
         post.setUser(user);
         post = postRepository.save(post);
     }
@@ -45,18 +45,18 @@ public class PostRepositoryIntegrationTest {
         Optional<User> user = userRepository.findByEmail("miras@gmail.com");
         assertTrue(user.isPresent());
         Post newPost = new Post();
-        newPost.setContent("New post");
+        newPost.setDescription("New post");
         newPost.setUser(user.get());
         newPost = postRepository.save(newPost);
         assertThat(newPost).isNotNull();
-        assertEquals(newPost.getContent(), "New post");
+        assertEquals(newPost.getDescription(), "New post");
     }
 
     @Test
     void shouldFindPostById() {
         var foundPost = postRepository.findById(post.getId());
         assertThat(foundPost).isPresent();
-        assertEquals(post.getContent(), foundPost.get().getContent());
+        assertEquals(post.getDescription(), foundPost.get().getDescription());
     }
 
     @Test
@@ -67,9 +67,9 @@ public class PostRepositoryIntegrationTest {
 
     @Test
     void shouldUpdatePost() {
-        post.setContent("Updated post");
+        post.setDescription("Updated post");
         post = postRepository.save(post);
-        assertEquals(post.getContent(), "Updated post");
+        assertEquals(post.getDescription(), "Updated post");
     }
 
     @Test
@@ -96,7 +96,7 @@ public class PostRepositoryIntegrationTest {
         user = userRepository.save(user);
 
         Post post = new Post();
-        post.setContent("Hello, Test User!");
+        post.setDescription("Hello, Test User!");
         post.setUser(user);
         post = postRepository.save(post);
 

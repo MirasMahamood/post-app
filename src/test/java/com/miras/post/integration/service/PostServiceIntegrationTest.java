@@ -27,7 +27,7 @@ public class PostServiceIntegrationTest {
     @BeforeEach
     public void setUp() {
         post = new Post();
-        post.setContent("Hello, Miras!");
+        post.setDescription("Hello, Miras!");
     }
 
     @Test
@@ -35,24 +35,24 @@ public class PostServiceIntegrationTest {
     public void createPostSuccess() {
         Post createdPost = postService.createPost(post);
         assertNotNull(createdPost);
-        assertEquals(post.getContent(), createdPost.getContent());
+        assertEquals(post.getDescription(), createdPost.getDescription());
     }
 
     @Test
     @WithMockUser("miras@gmail.com")
     public void editPostSuccess() {
         Post createdPost = postService.createPost(post);
-        createdPost.setContent("Edited post");
+        createdPost.setDescription("Edited post");
         Post editedPost = postService.editPost(createdPost.getId(), createdPost);
         assertNotNull(editedPost);
-        assertEquals(createdPost.getContent(), editedPost.getContent());
+        assertEquals(createdPost.getDescription(), editedPost.getDescription());
     }
 
     @Test
     @WithMockUser("miras@gmail.com")
     public void editPostNotFound() {
         Post createdPost = postService.createPost(post);
-        createdPost.setContent("Edited post");
+        createdPost.setDescription("Edited post");
         assertThrows(ResourceNotFoundException.class, () -> postService.editPost(UUID.randomUUID(), createdPost));
     }
 
@@ -76,7 +76,7 @@ public class PostServiceIntegrationTest {
         Post createdPost = postService.createPost(post);
         Post retrievedPost = postService.getPost(createdPost.getId());
         assertNotNull(retrievedPost);
-        assertEquals(createdPost.getContent(), retrievedPost.getContent());
+        assertEquals(createdPost.getDescription(), retrievedPost.getDescription());
     }
 
     @Test

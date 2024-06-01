@@ -1,6 +1,5 @@
 package com.miras.post.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,7 +18,7 @@ public class Post extends AuditModel implements Serializable {
     @NotNull(message = "Description is required")
     @Size(max = 1000, message = "Description should not be more than 1000 characters")
     @Column(length = 1000, nullable = false)
-    private String content;
+    private String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id",referencedColumnName = "id", nullable = false)
@@ -33,12 +32,12 @@ public class Post extends AuditModel implements Serializable {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public String getDescription() {
+        return description;
     }
 
-    public void setContent(String description) {
-        this.content = description;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public User getUser() {

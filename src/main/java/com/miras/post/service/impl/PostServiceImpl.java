@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService {
     public Post editPost(UUID id, Post post) {
         Post _post = getPost(id);
         validatePostUserWithLoggedInUser(_post.getUser().getEmail());
-        _post.setContent(post.getContent());
+        _post.setDescription(post.getDescription());
         return postRepository.save(_post);
     }
 

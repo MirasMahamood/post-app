@@ -1,5 +1,10 @@
 @startuml
-
+skinparam defaultFontSize 35
+skinparam nodesep 10
+skinparam ranksep 40
+class PostApplication {
+    {static} main(String[] args)
+}
 package "Configurations" {
     class AuditConfig {
     }
@@ -8,46 +13,46 @@ package "Configurations" {
       String redisHost
       int redisPort
       --
-      +redisConnectionFactory(): RedisConnectionFactory
-      +cacheManager(RedisConnectionFactory): RedisCacheManager
+      +redisConnectionFactory()
+      +cacheManager(RedisConnectionFactory)
     }
 
     class SecurityConfig {
       --
-      +passwordEncoder(): PasswordEncoder
-      +securityFilterChain(HttpSecurity): SecurityFilterChain
-      +userDetailsService(): UserDetailsService
-      +authenticationProvider(): AuthenticationProvider
+      +passwordEncoder()
+      +securityFilterChain(HttpSecurity)
+      +userDetailsService()
+      +authenticationProvider()
     }
+    AuditConfig -[hidden]d- "RedisConfig"
+     "RedisConfig" -[hidden]d- "SecurityConfig"
 }
-
 package "Controllers" {
     class PostController {
       --
-      +createPost(Post): ResponseEntity<Post>
-      +editPost(UUID, Post): ResponseEntity<Post>
-      +deletePost(UUID): ResponseEntity<Void>
-      +getPost(UUID): ResponseEntity<Post>
-      +getAllPosts(int, int): ResponseEntity<?>
-      +getAllUserPosts(UUID, int, int): ResponseEntity<?>
+      +createPost(Post)
+      +editPost(UUID, Post)
+      +deletePost(UUID)
+      +getPost(UUID)
+      +getAllPosts(int, int)
+      +getAllUserPosts(UUID, int, int)
     }
-
     class UserController {
       --
-      +getAllUsers(Pageable): ResponseEntity<?>
-      +saveUser(User): ResponseEntity<?>
+      +getAllUsers(Pageable)
+      +saveUser(User)
     }
+    "PostController" -[hidden]d- "UserController"
 }
-
 package "Services" {
     class PostService {
       --
-      +createPost(Post): Post
-      +editPost(UUID, Post): Post
-      +deletePost(UUID): void
-      +getPost(UUID): Post
-      +getAllPosts(int, int): Slice<Post>
-      +getAllUserPosts(UUID, int, int): Page<Post>
+      +createPost(Post)
+      +editPost(UUID, Post)
+      +deletePost(UUID)
+      +getPost(UUID)
+      +getAllPosts(int, int)
+      +getAllUserPosts(UUID, int, int)
     }
 
     class UserService {
@@ -77,9 +82,10 @@ package "Services" {
     }
     class PostServiceImpl implements PostService
     class UserServiceImpl implements UserService
-    class CustomUserDetailsService implements springsecurity.UserDetailsService
+    class CustomUserDetailsService implements UserDetailsService
+    PostServiceImpl -[hidden]d- "UserService"
+    UserServiceImpl -[hidden]d- "UserDetailsService"
 }
-
 package "Repositories" {
     class PostRepository {
       --
@@ -91,8 +97,8 @@ package "Repositories" {
       --
       +findByEmail(String): Optional<User>
     }
+    PostRepository -[hidden]d- "UserRepository"
 }
-
 package "Models" {
     class Post {
       UUID id
@@ -116,17 +122,11 @@ package "Models" {
     AuditModel <|-- Post
     AuditModel <|-- User
 }
-
-class PostApplication {
-}
-"Configurations" -[hidden]] "Controllers"
-"RedisConfig" -[hidden]down- "PostService"
-"PostController" -[hidden]down- "PostRepository"
-"PostRepository" -[hidden]down- "CustomUserDetailsService"
-"UserRepository" -[hidden]down- "PostApplication"
-
-
-
+"PostApplication" -[hidden]d- "AuditConfig"
+"Configurations" -[hidden]r- "Controllers"
+"Controllers" -[hidden]r- "Services"
+"Services" -[hidden]r- "Repositories"
+"Repositories" -[hidden]r- "Models"
 newpage
 package "Exceptions" {
     class ErrorMessages {

@@ -18,7 +18,7 @@ public class TestData {
     public static Post getTestPost() {
         Post post = new Post();
         post.setId(UUID.fromString("10f72209-3d69-4e2a-809a-3f53909642d6"));
-        post.setContent("Test Content");
+        post.setDescription("Test Content");
         post.setCreatedDate(Instant.parse("2024-05-24T08:07:37.511475Z"));
         post.setModifiedDate(Instant.parse("2024-05-24T08:07:37.511475Z"));
         post.setUser(getTestUser());

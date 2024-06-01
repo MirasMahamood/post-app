@@ -66,7 +66,7 @@ public class PostControllerUnitTest {
     public void editPostSuccess() {
         Post post = TestData.getTestPost();
         UUID postId = post.getId();
-        post.setContent("New edited content");
+        post.setDescription("New edited content");
         when(postService.editPost(postId, post)).thenReturn(post);
 
         ResponseEntity<Post> response = postController.editPost(postId, post);

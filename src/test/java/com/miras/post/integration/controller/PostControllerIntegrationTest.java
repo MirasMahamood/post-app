@@ -72,7 +72,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     void createPostSuccess() throws Exception {
         Post post = new Post();
-        post.setContent("Hello, Miras!");
+        post.setDescription("Hello, Miras!");
         RequestBuilder requestBuilder = post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post))
@@ -81,7 +81,7 @@ class PostControllerIntegrationTest {
                 .andExpect(status().isOk()).andReturn();
         Post newPost = mapper.readValue(result.getResponse().getContentAsString(), Post.class);
         assertNotNull(newPost);
-        assertEquals(post.getContent(), newPost.getContent());
+        assertEquals(post.getDescription(), newPost.getDescription());
     }
 
     @Test
@@ -124,7 +124,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void testEditPostSuccess() throws Exception {
         Post post = createPost();
-        post.setContent("Edited post");
+        post.setDescription("Edited post");
         RequestBuilder requestBuilder = put("/posts/{id}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
@@ -133,14 +133,14 @@ class PostControllerIntegrationTest {
                 .andExpect(status().isOk()).andReturn();
         Post editedPost = mapper.readValue(result.getResponse().getContentAsString(), Post.class);
         assertNotNull(editedPost);
-        assertEquals(post.getContent(), editedPost.getContent());
+        assertEquals(post.getDescription(), editedPost.getDescription());
     }
 
     @Test
     @WithMockUser("miras@gmail.com")
     public void testEditPostNotFound() throws Exception {
         Post post = createPost();
-        post.setContent("Edited content");
+        post.setDescription("Edited content");
         RequestBuilder requestBuilder = put("/posts/{id}", UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
@@ -153,7 +153,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void testEditDescriptionNotFound() throws Exception {
         Post post = createPost();
-        post.setContent(null);
+        post.setDescription(null);
         RequestBuilder requestBuilder = put("/posts/{id}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
@@ -227,7 +227,7 @@ class PostControllerIntegrationTest {
 
     private Post createPost() {
         Post post = new Post();
-        post.setContent("New post");
+        post.setDescription("New post");
         return postService.createPost(post);
     }
 }

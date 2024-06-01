@@ -1,0 +1,16 @@
+@startuml
+actor User
+participant "PostController" as PC
+participant "PostService" as PS
+participant "PostRepository" as PR
+database DB
+
+User -> PC : POST /post
+PC -> PS : createPost(post)
+PS -> PR : save(post)
+PR -> DB : insert into posts
+DB --> PR : Post saved
+PR --> PS : return saved Post
+PS --> PC : return saved Post
+PC --> User : return saved Post
+@enduml
