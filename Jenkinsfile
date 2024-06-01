@@ -1,41 +1,38 @@
 pipeline {
-  agent any
-  stages {
-    stage('Checkout') {
-      steps {
-        script {
-          checkout scm
-        }
+    agent any
 
-      }
+    environment {
+        registry = "mirasap/post-app:0.0.1"
+        registryCredential = 'dockerHub'
+        dockerImage = ''
     }
 
-    stage('Build and Test') {
-      steps {
-        script {
-          sh './gradlew clean build'
+    stages {
+        stage('Build and Test') {
+            steps {
+                script {
+                    sh './gradlew clean build'
+                }
+            }
         }
-
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
-        script {
-          sh 'docker build --platform=linux/amd64 -t mirasap/post-app:latest .'
+        stage('Build Docker Image') {
+            steps {
+                script {
+                   dockerImage = docker.build registry
+                }
+            }
         }
-
-      }
-    }
-
-    stage('Push image to Docker Hub') {
-      steps {
-        script {
-          sh 'docker push mirasap/post-app:latest'
+        stage('Push image to Docker Hub') {
+            steps {
+                script {
+                    dockerImage.push()
+                }
+            }
         }
-
-      }
     }
-
-  }
+    post {
+        success {
+            echo 'Successfully built and pushed the Docker image'
+        }
+    }
 }
