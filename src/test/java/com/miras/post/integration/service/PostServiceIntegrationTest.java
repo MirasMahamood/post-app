@@ -3,6 +3,7 @@ package com.miras.post.integration.service;
 import com.miras.post.exception.ResourceNotFoundException;
 import com.miras.post.model.Post;
 import com.miras.post.service.PostService;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.util.UUID;
 
@@ -36,6 +38,25 @@ public class PostServiceIntegrationTest {
         Post createdPost = postService.createPost(post);
         assertNotNull(createdPost);
         assertEquals(post.getDescription(), createdPost.getDescription());
+    }
+
+    @Test
+    @WithMockUser("miras@gmail.com")
+    public void createPostSuccessWithLongDescription() {
+        Post post = new Post();
+        String longDescription = TestData.getDescriptionWithLength(1000);
+        post.setDescription(longDescription);
+        Post newPost = postService.createPost(post);
+        assertNotNull(newPost);
+        assertEquals(longDescription, newPost.getDescription());
+    }
+
+    @Test
+    @WithMockUser("miras@gmail.com")
+    public void createPostFailureWithLongDescription() {
+        Post post = new Post();
+        post.setDescription(TestData.getDescriptionWithLength(1001));
+        assertThrows(TransactionSystemException.class, () -> postService.createPost(post));
     }
 
     @Test

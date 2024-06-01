@@ -19,7 +19,10 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.TransactionSystemException;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +54,7 @@ public class PostServiceUnitTest {
         closeable = MockitoAnnotations.openMocks(this);
         Authentication auth = new UsernamePasswordAuthenticationToken(TestData.getTestUser().getEmail(),null);
         SecurityContextHolder.getContext().setAuthentication(auth);
+        ReflectionTestUtils.setField(postService, "pageSize", 20);
     }
 
     @AfterEach
@@ -68,6 +72,17 @@ public class PostServiceUnitTest {
 
         assertNotNull(result);
         verify(postRepository, times(1)).save(post);
+    }
+
+    @Test
+    public void createPostFailureWithLongDescription() {
+        Post post = TestData.getTestPost();
+        String longDescription = TestData.getDescriptionWithLength(1001);
+        post.setDescription(longDescription);
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(post.getUser()));
+        when(postRepository.save(any(Post.class))).thenThrow(new TransactionSystemException("Description should not be more than 1000 characters"));
+
+        assertThrows(TransactionSystemException.class, () -> postService.createPost(post));
     }
 
     @Test
@@ -128,32 +143,41 @@ public class PostServiceUnitTest {
 
     @Test
     public void getAllPostsSuccessfully() {
-        int page = 0;
-        int size = 10;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("modifiedDate").descending());
         when(postRepository.findAllBy(pageable)).thenReturn(TestData.getAllTestPosts());
 
-        Slice<Post> result = postService.getAllPosts(page, size);
+        Slice<Post> result = postService.getAllPosts(0);
 
         assertNotNull(result);
         verify(postRepository, times(1)).findAllBy(pageable);
         assertTrue(result.hasContent());
-        assertEquals(result.getContent().size(), 1);
+        assertEquals(1, result.getContent().size());
         assertFalse(result.hasNext());
-        assertEquals(result.getNumber(), page);
+        assertEquals(result.getNumber(), 0);
+    }
+
+    @Test
+    public void getAllPostsReturnsEmptyWhenNoPosts() {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("modifiedDate").descending());
+        when(postRepository.findAllBy(pageable)).thenReturn(new SliceImpl<>(new ArrayList<>()));
+
+        Slice<Post> result = postService.getAllPosts(0);
+
+        assertNotNull(result);
+        verify(postRepository, times(1)).findAllBy(pageable);
+        assertFalse(result.hasContent());
     }
 
     @Test
     public void getAllUserPostsSuccessfully() {
         int page = 0;
-        int size = 10;
         User user = TestData.getTestUser();
         UUID userId = user.getId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+        Pageable pageable = PageRequest.of(page, 20, Sort.by("modifiedDate").descending());
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(postRepository.findByUser(user, pageable)).thenReturn(TestData.getAllUserPosts());
 
-        Page<Post> result = postService.getAllUserPosts(userId, page, size);
+        Page<Post> result = postService.getAllUserPosts(userId, page);
 
         assertNotNull(result);
         verify(userRepository, times(1)).findById(userId);
@@ -170,10 +194,9 @@ public class PostServiceUnitTest {
         User user = TestData.getTestUser();
         UUID userId = user.getId();
         int page = 0;
-        int size = 10;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> postService.getAllUserPosts(userId, page, size));
+        assertThrows(ResourceNotFoundException.class, () -> postService.getAllUserPosts(userId, page));
         verify(userRepository, times(1)).findById(userId);
         verify(postRepository, times(0)).findByUser(user, PageRequest.of(0, 1));
     }

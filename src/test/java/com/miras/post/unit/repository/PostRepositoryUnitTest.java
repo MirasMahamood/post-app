@@ -3,18 +3,20 @@ package com.miras.post.unit.repository;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.PostRepository;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PostRepositoryUnitTest {
@@ -32,6 +34,27 @@ class PostRepositoryUnitTest {
     @AfterEach
     void closeService() throws Exception {
         closeable.close();
+    }
+
+    @Test
+    public void createPostSuccess() {
+        Post post = new Post();
+        post.setDescription("New post");
+
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+
+        Post savedPost = postRepository.save(post);
+        assertEquals(post.getDescription(), savedPost.getDescription());
+    }
+
+    @Test
+    public void createPostFailureWithLongDescription() {
+        Post post = new Post();
+        post.setDescription(TestData.getDescriptionWithLength(1001));
+
+        when(postRepository.save(any(Post.class))).thenThrow(new TransactionSystemException("Description should not be more than 1000 characters"));
+
+        assertThrows(TransactionSystemException.class, () -> postRepository.save(post));
     }
 
     @Test

@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/createData/**", "/swagger-ui/**", "v3/api-docs/**").permitAll()
+                        .requestMatchers("/createData/**", "/swagger-ui/**", "v3/api-docs/**", "/users/register").permitAll()
                         .requestMatchers("/posts/**", "/users/**").authenticated()
                         .dispatcherTypeMatchers(DispatcherType.ERROR).authenticated()
                         .anyRequest().denyAll())

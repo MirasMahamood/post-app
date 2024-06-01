@@ -4,6 +4,7 @@ import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.PostRepository;
 import com.miras.post.repository.UserRepository;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class PostRepositoryIntegrationTest {
@@ -31,9 +32,11 @@ public class PostRepositoryIntegrationTest {
 
     private Post post;
 
+    private User user;
+
     @BeforeEach
     void setUp() {
-        User user = userRepository.findByEmail("miras@gmail.com").orElseThrow();
+        user = userRepository.findByEmail("miras@gmail.com").orElseThrow();
         post = new Post();
         post.setDescription("Hello, Miras!");
         post.setUser(user);
@@ -42,14 +45,31 @@ public class PostRepositoryIntegrationTest {
 
     @Test
     void shouldSavePost() {
-        Optional<User> user = userRepository.findByEmail("miras@gmail.com");
-        assertTrue(user.isPresent());
         Post newPost = new Post();
         newPost.setDescription("New post");
-        newPost.setUser(user.get());
+        newPost.setUser(user);
         newPost = postRepository.save(newPost);
         assertThat(newPost).isNotNull();
         assertEquals(newPost.getDescription(), "New post");
+    }
+
+    @Test
+    void shouldSavePostWithLongDescription() {
+        Post post = new Post();
+        post.setUser(user);
+        String longDescription = TestData.getDescriptionWithLength(1000);
+        post.setDescription(longDescription);
+        Post newPost = postRepository.save(post);
+        assertNotNull(newPost);
+        assertEquals(longDescription, newPost.getDescription());
+    }
+
+    @Test
+    void shouldNotSavePostWithLongDescription() {
+        Post post = new Post();
+        post.setDescription(TestData.getDescriptionWithLength(1001));
+
+        assertThrows(TransactionSystemException.class, () -> postRepository.save(post));
     }
 
     @Test
@@ -98,7 +118,7 @@ public class PostRepositoryIntegrationTest {
         Post post = new Post();
         post.setDescription("Hello, Test User!");
         post.setUser(user);
-        post = postRepository.save(post);
+        postRepository.save(post);
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> posts = postRepository.findByUser(user, pageable);

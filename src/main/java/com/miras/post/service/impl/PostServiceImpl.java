@@ -1,6 +1,7 @@
 package com.miras.post.service.impl;
 
 import com.miras.post.exception.ErrorMessages;
+import com.miras.post.exception.NotAllowedToEditException;
 import com.miras.post.exception.ResourceNotFoundException;
 import com.miras.post.model.Post;
 import com.miras.post.model.User;
@@ -9,6 +10,7 @@ import com.miras.post.repository.UserRepository;
 import com.miras.post.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,11 +29,12 @@ import java.util.UUID;
 public class PostServiceImpl implements PostService {
 
     private static final Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
     private final RedisCacheManager redisCacheManager;
+
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int pageSize;
 
     public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, RedisCacheManager redisCacheManager) {
         this.postRepository = postRepository;
@@ -76,16 +79,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Slice<Post> getAllPosts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+    public Slice<Post> getAllPosts(int page) {
+;        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("modifiedDate").descending());
         return postRepository.findAllBy(pageable);
     }
 
     @Override
-    public Page<Post> getAllUserPosts(UUID userId, int page, int size) {
+    public Page<Post> getAllUserPosts(UUID userId, int page) {
         Optional<User> user = userRepository.findById(userId);
         if(user.isPresent()) {
-            Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+            Pageable pageable = PageRequest.of(page, pageSize, Sort.by("modifiedDate").descending());
             return postRepository.findByUser(user.get(), pageable);
         } else {
             logger.error("{} User ID: {}", ErrorMessages.ERROR_USER_NOT_FOUND, userId);
@@ -106,7 +109,7 @@ public class PostServiceImpl implements PostService {
     private void validatePostUserWithLoggedInUser(String postUserEmail) {
         if (!postUserEmail.equals(getLoggedInUserEmail())) {
             logger.error("Logged in user is {}, and post user is {}", getLoggedInUserEmail(), postUserEmail);
-            throw new SecurityException(ErrorMessages.ERROR_POST_MODIFY_NOT_ALLOWED);
+            throw new NotAllowedToEditException(ErrorMessages.ERROR_POST_MODIFY_NOT_ALLOWED);
         }
     }
 }

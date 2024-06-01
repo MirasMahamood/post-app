@@ -8,12 +8,17 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
 public class TestData {
+
+    public static String getDescriptionWithLength(int length) {
+        return String.join("", Collections.nCopies(length, "a"));
+    }
 
     public static Post getTestPost() {
         Post post = new Post();

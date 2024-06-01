@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value= ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex){
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
         logger.error(String.valueOf(HttpStatus.NOT_FOUND), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
@@ -30,6 +30,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(ResourceAlreadyExistsException ex){
         logger.error(String.valueOf(HttpStatus.CONFLICT), ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(),
+                ex.getMessage()));
+    }
+
+    @ExceptionHandler(value=NotAllowedToEditException.class)
+    public ResponseEntity<ErrorResponse> handlNotAllowedToEditException(NotAllowedToEditException ex) {
+        logger.error(String.valueOf(HttpStatus.FORBIDDEN), ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(HttpStatus.FORBIDDEN.value(),
                 ex.getMessage()));
     }
 

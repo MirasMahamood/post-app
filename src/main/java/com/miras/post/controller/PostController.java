@@ -44,9 +44,8 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPosts(@RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "50") int size) {
-        Slice<Post> pagePosts = postService.getAllPosts(page, size);
+    public ResponseEntity<?> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+        Slice<Post> pagePosts = postService.getAllPosts(page);
         Map<String, Object> response = new HashMap<>();
         response.put("posts", pagePosts.getContent());
         response.put("currentPage", pagePosts.getNumber());
@@ -57,9 +56,8 @@ public class PostController {
 
     @GetMapping("user/{userId}")
     public ResponseEntity<?> getAllUserPosts(@PathVariable UUID userId,
-                                             @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "50") int size) {
-        Page<Post> pagePosts = postService.getAllUserPosts(userId, page, size);
+                                             @RequestParam(defaultValue = "0") int page) {
+        Page<Post> pagePosts = postService.getAllUserPosts(userId, page);
         Map<String, Object> response = new HashMap<>();
         response.put("posts", pagePosts.getContent());
         response.put("currentPage", pagePosts.getNumber());

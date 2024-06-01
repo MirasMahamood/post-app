@@ -15,8 +15,8 @@ public interface PostService {
 
     Post getPost(UUID id);
 
-    Slice<Post> getAllPosts(int page, int size);
+    Slice<Post> getAllPosts(int page);
 
-    Page<Post> getAllUserPosts(UUID userId, int page, int size);
+    Page<Post> getAllUserPosts(UUID userId, int page);
 
 }

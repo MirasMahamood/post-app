@@ -8,6 +8,7 @@ import com.miras.post.model.Post;
 import com.miras.post.model.User;
 import com.miras.post.repository.UserRepository;
 import com.miras.post.service.PostService;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,12 +74,15 @@ class PostControllerIntegrationTest {
     void createPostSuccess() throws Exception {
         Post post = new Post();
         post.setDescription("Hello, Miras!");
+
         RequestBuilder requestBuilder = post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post))
                 .accept(MediaType.APPLICATION_JSON);
+
         MvcResult result = mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk()).andReturn();
+
         Post newPost = mapper.readValue(result.getResponse().getContentAsString(), Post.class);
         assertNotNull(newPost);
         assertEquals(post.getDescription(), newPost.getDescription());
@@ -86,13 +90,50 @@ class PostControllerIntegrationTest {
 
     @Test
     @WithMockUser("miras@gmail.com")
-    public void testCreatePostFailureWithoutDescription() throws Exception {
+    void createPostSuccessWithLongDescription() throws Exception {
         Post post = new Post();
-        String expectedResponse = "{\"statusCode\":400,\"message\":\"[Description is required]\"}";
+        post.setDescription(TestData.getDescriptionWithLength(1000));
+
         RequestBuilder requestBuilder = post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post))
                 .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk()).andReturn();
+
+        Post newPost = mapper.readValue(result.getResponse().getContentAsString(), Post.class);
+        assertNotNull(newPost);
+        assertEquals(post.getDescription(), newPost.getDescription());
+    }
+
+    @Test
+    @WithMockUser("miras@gmail.com")
+    public void createPostFailureWithLongDescription() throws Exception {
+        Post post = new Post();
+        post.setDescription(TestData.getDescriptionWithLength(1001));
+
+        RequestBuilder requestBuilder = post("/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(post))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("{\"statusCode\":400,\"message\":\"[Description should not be more than 1000 characters]\"}"));
+    }
+
+    @Test
+    @WithMockUser("miras@gmail.com")
+    public void createPostFailureWithoutDescription() throws Exception {
+        Post post = new Post();
+        String expectedResponse = "{\"statusCode\":400,\"message\":\"[Description is required]\"}";
+
+        RequestBuilder requestBuilder = post("/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(post))
+                .accept(MediaType.APPLICATION_JSON);
+
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(expectedResponse));
@@ -103,6 +144,7 @@ class PostControllerIntegrationTest {
     public void getPostSuccess() throws Exception {
         Post post = createPost();
         assertNotNull(post.getId());
+
         RequestBuilder requestBuilder = get("/posts/{id}", post.getId());
 
         mockMvc.perform(requestBuilder)
@@ -114,7 +156,9 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void getPostNotFound() throws Exception {
         UUID id = UUID.randomUUID();
+
         RequestBuilder requestBuilder = get("/posts/{id}", id);
+
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("{\"statusCode\":404,\"message\":\"Requested post does not exists\"}"));
@@ -125,12 +169,14 @@ class PostControllerIntegrationTest {
     public void testEditPostSuccess() throws Exception {
         Post post = createPost();
         post.setDescription("Edited post");
+
         RequestBuilder requestBuilder = put("/posts/{id}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
 
         MvcResult result = mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk()).andReturn();
+
         Post editedPost = mapper.readValue(result.getResponse().getContentAsString(), Post.class);
         assertNotNull(editedPost);
         assertEquals(post.getDescription(), editedPost.getDescription());
@@ -141,6 +187,7 @@ class PostControllerIntegrationTest {
     public void testEditPostNotFound() throws Exception {
         Post post = createPost();
         post.setDescription("Edited content");
+
         RequestBuilder requestBuilder = put("/posts/{id}", UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
@@ -154,6 +201,7 @@ class PostControllerIntegrationTest {
     public void testEditDescriptionNotFound() throws Exception {
         Post post = createPost();
         post.setDescription(null);
+
         RequestBuilder requestBuilder = put("/posts/{id}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(post));
@@ -166,6 +214,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void testDeletePostSuccess() throws Exception {
         Post post = createPost();
+
         RequestBuilder requestBuilder = delete("/posts/{id}", post.getId());
 
         mockMvc.perform(requestBuilder).andExpect(status().isOk());
@@ -194,6 +243,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void getAllUserPostsSuccess() throws Exception {
         User user = userRepository.findByEmail("miras@gmail.com").orElseThrow();
+
         RequestBuilder requestBuilder = get("/posts/user/{userId}", user.getId())
                 .param("page", "0")
                 .param("size", "10");
@@ -221,6 +271,7 @@ class PostControllerIntegrationTest {
         RequestBuilder requestBuilder = post("/posts", UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson);
+
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isBadRequest());
     }

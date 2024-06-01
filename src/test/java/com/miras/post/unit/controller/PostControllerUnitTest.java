@@ -1,10 +1,10 @@
 package com.miras.post.unit.controller;
 
-import com.miras.post.unit.TestData;
 import com.miras.post.controller.PostController;
 import com.miras.post.exception.ResourceAlreadyExistsException;
 import com.miras.post.model.Post;
 import com.miras.post.service.PostService;
+import com.miras.post.unit.TestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.util.Map;
 import java.util.UUID;
@@ -61,6 +62,16 @@ public class PostControllerUnitTest {
              assertEquals("Post already exists", ex.getMessage());
          }
      }
+
+    @Test
+    public void createPostFailureWithLongDescription() {
+        Post post = new Post();
+        post.setDescription(TestData.getDescriptionWithLength(1001));
+
+        when(postService.createPost(any(Post.class))).thenThrow(new TransactionSystemException("Description should not be more than 1000 characters"));
+
+        assertThrows(TransactionSystemException.class, () -> postController.createPost(post));
+    }
 
     @Test
     public void editPostSuccess() {
@@ -124,9 +135,9 @@ public class PostControllerUnitTest {
 
     @Test
     public void getAllPostsSuccess() {
-        when(postService.getAllPosts(0, 50)).thenReturn(TestData.getAllTestPosts());
+        when(postService.getAllPosts(0)).thenReturn(TestData.getAllTestPosts());
 
-        ResponseEntity<?> response = postController.getAllPosts(0, 50);
+        ResponseEntity<?> response = postController.getAllPosts(0);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody() instanceof Map);
@@ -139,17 +150,17 @@ public class PostControllerUnitTest {
 
     @Test
     public void getAllPostsFailure() {
-        when(postService.getAllPosts(0, 50)).thenThrow(new RuntimeException());
+        when(postService.getAllPosts(0)).thenThrow(new RuntimeException());
 
-        assertThrows(RuntimeException.class, () -> postController.getAllPosts(0, 50));
+        assertThrows(RuntimeException.class, () -> postController.getAllPosts(0));
     }
 
     @Test
     public void getAllUserPostsSuccess() {
         UUID userId = UUID.randomUUID();
-        when(postService.getAllUserPosts(userId, 0, 50)).thenReturn(TestData.getAllUserPosts());
+        when(postService.getAllUserPosts(userId, 0)).thenReturn(TestData.getAllUserPosts());
 
-        ResponseEntity<?> response = postController.getAllUserPosts(userId, 0, 50);
+        ResponseEntity<?> response = postController.getAllUserPosts(userId, 0);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody() instanceof Map);
@@ -163,9 +174,9 @@ public class PostControllerUnitTest {
     @Test
     public void getAllUserPostsFailure() {
         UUID userId = UUID.randomUUID();
-        when(postService.getAllUserPosts(userId, 0, 50)).thenThrow(new RuntimeException());
+        when(postService.getAllUserPosts(userId, 0)).thenThrow(new RuntimeException());
 
-        assertThrows(RuntimeException.class, () -> postController.getAllUserPosts(userId, 0, 50));
+        assertThrows(RuntimeException.class, () -> postController.getAllUserPosts(userId, 0));
     }
 
 }

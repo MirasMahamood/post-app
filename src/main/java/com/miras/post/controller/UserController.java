@@ -28,9 +28,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(
-            @PageableDefault(sort = { "modifiedDate"}, direction = Sort.Direction.DESC, size = 20) Pageable pageable) {
-        Page<User> pageUsers = userService.getAllUsers(pageable);
+    public ResponseEntity<?> getAllUsers(@RequestParam(defaultValue = "0") int page) {
+        Page<User> pageUsers = userService.getAllUsers(page);
         Map<String, Object> response = new HashMap<>();
         response.put("users", pageUsers.getContent());
         response.put("currentPage", pageUsers.getNumber() + 1);
@@ -39,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<?> saveUser(@Valid @RequestBody User user) {
         userService.saveUser(user);
         return new ResponseEntity<>(null, HttpStatus.CREATED);

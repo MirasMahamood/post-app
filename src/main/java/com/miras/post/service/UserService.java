@@ -8,6 +8,6 @@ public interface UserService {
 
     void saveUser(User user);
 
-    Page<User> getAllUsers(Pageable pageable);
+    Page<User> getAllUsers(int page);
 
 }
