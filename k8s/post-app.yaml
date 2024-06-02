@@ -54,6 +54,11 @@ spec:
                 configMapKeyRef:
                   name: post-config
                   key: redisPort
+            - name: REDIS_TTL_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: post-config
+                  key: redisTtlMinutes
 ---
 apiVersion: v1
 kind: Service

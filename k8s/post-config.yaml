@@ -7,3 +7,4 @@ data:
   dbName: postgres
   redisHost: redis-cache
   redisPort: "6379"
+  redisTtlMinutes: "60"

@@ -26,6 +26,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.ttl-minutes}")
+    private int ttlMinutes;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
@@ -34,10 +37,12 @@ public class RedisConfig {
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
         RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60)).enableTimeToIdle()
+                .entryTtl(Duration.ofMinutes(ttlMinutes)).enableTimeToIdle()
                 .disableCachingNullValues()
                 .serializeValuesWith(fromSerializer(new GenericJackson2JsonRedisSerializer(mapper)));
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultCacheConfig)
                 .build();
