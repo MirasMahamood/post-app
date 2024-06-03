@@ -20,7 +20,6 @@ public abstract class AuditModel {
 
     @Column(nullable = false)
     @LastModifiedDate
-
     private Instant modifiedDate;
 
     public Instant getCreatedDate() {
