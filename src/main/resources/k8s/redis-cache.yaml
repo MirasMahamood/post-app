@@ -15,7 +15,7 @@ spec:
         app: redis-cache
     spec:
       containers:
-        - image: redis:7.2.5
+        - image: redis:7.4.0
           imagePullPolicy: Always
           name: redis
           ports:

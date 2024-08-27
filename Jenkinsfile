@@ -29,10 +29,17 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh 'kubectl apply -f build/resources/main/k8s/app.yaml'
+                }
+            }
+        }
     }
     post {
         success {
-            echo 'Successfully built and pushed the Docker image'
+            echo 'Successfully built and deployed'
         }
     }
 }

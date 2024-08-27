@@ -1,6 +1,8 @@
 package com.miras.post.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -15,7 +17,7 @@ public class Post extends AuditModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull(message = "Description is required")
+    @NotBlank(message = "Description is mandatory")
     @Size(max = 1000, message = "Description should not be more than 1000 characters")
     @Column(length = 1000, nullable = false)
     private String description;

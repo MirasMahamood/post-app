@@ -127,7 +127,7 @@ class PostControllerIntegrationTest {
     @WithMockUser("miras@gmail.com")
     public void createPostFailureWithoutDescription() throws Exception {
         Post post = new Post();
-        String expectedResponse = "{\"statusCode\":400,\"message\":\"[Description is required]\"}";
+        String expectedResponse = "{\"statusCode\":400,\"message\":\"[Description is mandatory]\"}";
 
         RequestBuilder requestBuilder = post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +207,7 @@ class PostControllerIntegrationTest {
                 .content(mapper.writeValueAsString(post));
 
         mockMvc.perform(requestBuilder).andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"statusCode\":400,\"message\":\"[Description is required]\"}"));
+                .andExpect(content().json("{\"statusCode\":400,\"message\":\"[Description is mandatory]\"}"));
     }
 
     @Test

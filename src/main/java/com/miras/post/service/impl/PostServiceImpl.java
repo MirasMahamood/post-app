@@ -25,28 +25,25 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@EnableCaching
 public class PostServiceImpl implements PostService {
 
     private static final Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final RedisCacheManager redisCacheManager;
 
     @Value("${spring.data.web.pageable.default-page-size}")
     private int pageSize;
 
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, RedisCacheManager redisCacheManager) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
-        this.redisCacheManager = redisCacheManager;
     }
 
+    @CacheEvict(value = "post", key = "#post.id")
     @Override
     public Post createPost(Post post) {
         post.setUser(getLoggedInUser());
         post = postRepository.save(post);
-        redisCacheManager.getCache("post").put(post.getId(), post);
         return post;
     }
 
