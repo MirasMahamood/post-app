@@ -41,5 +41,8 @@ pipeline {
         success {
             echo 'Successfully built and deployed'
         }
+        always {
+            junit '**/build/test-results/**/*.xml'
+        }
     }
 }
