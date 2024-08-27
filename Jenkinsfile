@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh 'kubectl apply -f build/resources/main/k8s/app.yaml'
+                    sh 'kubectl apply -f ./build/resources/main/k8s/post-app.yaml'
                 }
             }
         }
