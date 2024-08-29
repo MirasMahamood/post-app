@@ -3,8 +3,9 @@ kind: ConfigMap
 metadata:
   name: post-config
 data:
-  dbHost: postgresql
-  dbName: postgres
-  redisHost: redis-cache
+  dbHost: "postgresql"
+  dbName: "postgres"
+  redisHost: "redis-cache"
   redisPort: "6379"
   redisTtlMinutes: "60"
+  javaOpts: "-Xmx128m"

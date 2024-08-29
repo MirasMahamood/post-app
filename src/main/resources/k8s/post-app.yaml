@@ -43,7 +43,10 @@ spec:
                   name: postgresql-secrets
                   key: password
             - name: JAVA_OPTS
-              value: "-Xmx128m"
+              valueFrom:
+                configMapKeyRef:
+                  name: post-config
+                  key: javaOpts
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
